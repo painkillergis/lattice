@@ -1,5 +1,5 @@
 import { RefObject, useEffect, useRef } from 'react'
-import useShaders from './useShaders'
+import useProgram from './useProgram'
 import useWindowSize from './useWindowSize'
 
 function App() {
@@ -7,14 +7,12 @@ function App() {
   const canvas = ref.current
   const gl = canvas && canvas.getContext('webgl')
   const [width, height] = useWindowSize()
-  const [error, vertexShader, fragmentShader] = useShaders(gl)
+  const [error, program] = useProgram(gl)
   useEffect(() => {
-    if (!canvas || !gl || !vertexShader || !fragmentShader) return
+    if (!canvas || !gl || !program) return
 
     canvas.width = width
     canvas.height = height
-
-    const program = createProgram(gl, vertexShader, fragmentShader)
 
     const positionAttributeLocation = gl.getAttribLocation(
       program,
@@ -45,7 +43,7 @@ function App() {
     )
 
     gl.drawArrays(gl.TRIANGLES, 0, 3)
-  }, [gl, canvas, width, height, vertexShader, fragmentShader])
+  }, [gl, canvas, width, height, program])
 
   return error ? (
     <p>{error.message}</p>
@@ -55,19 +53,6 @@ function App() {
       style={{ display: 'block', width: '100%', height: '100%' }}
     />
   )
-}
-
-function createProgram(gl, ...shaders) {
-  const program = gl.createProgram()
-  shaders.forEach((shader) => gl.attachShader(program, shader))
-  gl.linkProgram(program)
-  if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    return program
-  }
-
-  const message = gl.getProgramInfoLog(program)
-  gl.deleteProgram(program)
-  throw Error(message)
 }
 
 export default App

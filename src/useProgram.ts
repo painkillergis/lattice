@@ -2,6 +2,15 @@ import { useEffect, useMemo, useState } from 'react'
 import vertexShaderSourcePath from './shaders/vertex.glsl'
 import fragmentShaderSourcePath from './shaders/fragment.glsl'
 
+function useProgram(gl: WebGLRenderingContext): [Error, WebGLProgram] {
+  const [error, vertexShader, fragmentShader] = useShaders(gl)
+  return useMemo(() => {
+    if (!gl || !vertexShader || !fragmentShader || error)
+      return [error, undefined]
+    return createProgram(gl, vertexShader, fragmentShader)
+  }, [gl, vertexShader, fragmentShader, error])
+}
+
 function useShaders(
   gl: WebGLRenderingContext,
 ): [Error, WebGLShader, WebGLShader] {
@@ -80,4 +89,21 @@ function createShader(
   }
 }
 
-export default useShaders
+function createProgram(gl, ...shaders): [Error, WebGLProgram] {
+  const program = gl.createProgram()
+  shaders.forEach((shader) => gl.attachShader(program, shader))
+  gl.linkProgram(program)
+  if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    return [undefined, program]
+  }
+
+  const message = gl.getProgramInfoLog(program)
+  gl.deleteProgram(program)
+  if (message.length > 0) {
+    return [Error(message), undefined]
+  } else {
+    return [Error(`Error linking program`), undefined]
+  }
+}
+
+export default useProgram
