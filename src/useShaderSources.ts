@@ -18,27 +18,27 @@ function reducer(state, action) {
 function useShaderSources() {
   const [state, dispatch] = useReducer(reducer, initialState)
   useEffect(() => {
-    ;[
-      { type: 'vertex', sourcePath: vertexShaderSourcePath },
-      { type: 'fragment', sourcePath: fragmentShaderSourcePath },
-    ].forEach(({ type, sourcePath }) => {
-      fetch(sourcePath)
-        .then((response) => response.text())
-        .then((source) =>
-          dispatch({
-            type: 'newShaderSource',
-            payload: { type, source },
-          }),
-        )
-        .catch((error) =>
-          dispatch({
-            type: 'newShaderSourceError',
-            payload: { type, error },
-          }),
-        )
-    })
+    fetchShaderSource(vertexShaderSourcePath, 'vertex', dispatch)
+    fetchShaderSource(fragmentShaderSourcePath, 'fragment', dispatch)
   }, [])
   return state
+}
+
+function fetchShaderSource(sourcePath, type, dispatch) {
+  fetch(sourcePath)
+    .then((response) => response.text())
+    .then((source) =>
+      dispatch({
+        type: 'newShaderSource',
+        payload: { type, source },
+      }),
+    )
+    .catch((error) =>
+      dispatch({
+        type: 'newShaderSourceError',
+        payload: { type, error },
+      }),
+    )
 }
 
 export default useShaderSources
