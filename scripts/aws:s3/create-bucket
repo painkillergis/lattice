@@ -1,0 +1,16 @@
+#!/bin/zsh
+aws s3api create-bucket \
+  --acl public-read \
+  --bucket lattice.painkillergis.com
+
+aws s3api put-bucket-cors \
+  --bucket lattice.painkillergis.com \
+  --cors-configuration file://scripts/aws:s3/cors-configuration.json
+
+aws s3api put-bucket-policy \
+  --bucket lattice.painkillergis.com \
+  --policy file://scripts/aws:s3/bucket-policy.json
+
+aws s3api put-bucket-website \
+  --bucket lattice.painkillergis.com \
+  --website-configuration file://scripts/aws:s3/website-configuration.json

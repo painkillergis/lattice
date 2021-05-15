@@ -1,0 +1,2 @@
+#!/bin/zsh
+aws cloudfront get-distribution --id file://scripts/aws:cloudfront/distribution-id

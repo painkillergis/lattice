@@ -1,0 +1,4 @@
+#!/bin/zsh
+aws cloudfront create-invalidation \
+  --distribution-id file://scripts/aws:cloudfront/distribution-id \
+  --invalidation-batch "Paths={Quantity=1,Items=[\"/index.html\"]},CallerReference=`uuidgen`"

@@ -1,0 +1,42 @@
+{
+  "Aliases": {
+    "Quantity": 1,
+    "Items": ["lattice.painkillergis.com"]
+  },
+  "DefaultRootObject": "index.html",
+  "Origins": {
+    "Quantity": 1,
+    "Items": [
+      {
+        "Id": "lattice.painkillergis.com.s3.amazonaws.com",
+        "DomainName": "lattice.painkillergis.com.s3.amazonaws.com",
+        "CustomOriginConfig": {
+          "HTTPPort": 80,
+          "HTTPSPort": 443,
+          "OriginProtocolPolicy": "http-only"
+        },
+        "ConnectionAttempts": 3,
+        "ConnectionTimeout": 10
+      }
+    ]
+  },
+  "DefaultCacheBehavior": {
+    "TargetOriginId": "lattice.painkillergis.com.s3.amazonaws.com",
+    "ViewerProtocolPolicy": "redirect-to-https",
+    "AllowedMethods": {
+      "Quantity": 3,
+      "Items": ["GET", "HEAD", "OPTIONS"],
+      "CachedMethods": {
+        "Quantity": 3,
+        "Items": ["GET", "HEAD", "OPTIONS"]
+      }
+    },
+    "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6"
+  },
+  "ViewerCertificate": {
+    "ACMCertificateArn": "arn:aws:acm:us-east-1:552879364626:certificate/43ad6826-3e0d-40aa-af05-2ac1f770a430",
+    "SSLSupportMethod": "sni-only"
+  },
+  "Comment": "",
+  "Enabled": true
+}

@@ -1,0 +1,4 @@
+#!/bin/zsh
+aws s3 sync build s3://lattice.painkillergis.com \
+  --cache-control max-age=86400 \
+  --content-encoding br

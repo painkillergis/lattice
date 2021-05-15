@@ -1,0 +1,6 @@
+#!/bin/zsh
+value=$(scripts/aws:cloudfront/get-distribution | jq .Distribution.DomainName -r)
+changeBatch=$(jq ".Changes[].ResourceRecordSet.ResourceRecords[].Value=\"$value\"" scripts/aws:route53/cname-template.json)
+aws route53 change-resource-record-sets \
+  --hosted-zone-id Z020039932WR8OUOBOALI \
+  --change-batch file://<(echo $changeBatch)
