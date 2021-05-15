@@ -4,7 +4,8 @@ import useWindowSize from './useWindowSize'
 
 function App() {
   const ref = useRef()
-  const [vertexShaderSource, fragmentShaderSource] = useShaderSources()
+  const [error, vertexShaderSource, fragmentShaderSource] =
+    useShaderSources()
   const [width, height] = useWindowSize()
 
   useEffect(() => {
@@ -55,7 +56,9 @@ function App() {
     gl.drawArrays(gl.TRIANGLES, 0, 3)
   }, [ref, width, height, vertexShaderSource, fragmentShaderSource])
 
-  return (
+  return error ? (
+    <p>{error.message}</p>
+  ) : (
     <canvas
       ref={ref}
       style={{ display: 'block', width: '100%', height: '100%' }}
