@@ -1,29 +1,20 @@
-import { useEffect, useRef } from 'react'
-import useShaderSources from './useShaderSources'
+import { RefObject, useEffect, useRef } from 'react'
+import useShaders from './useShaders'
 import useWindowSize from './useWindowSize'
 
 function App() {
-  const ref = useRef()
-  const [error, vertexShaderSource, fragmentShaderSource] =
-    useShaderSources()
+  const ref = useRef() as RefObject<HTMLCanvasElement>
+  const canvas = ref.current
+  const gl = canvas && canvas.getContext('webgl')
   const [width, height] = useWindowSize()
-
+  const [error, vertexShader, fragmentShader] = useShaders(gl)
   useEffect(() => {
-    const current = ref.current
-    if (!current || !vertexShaderSource || !fragmentShaderSource) return
-
-    const canvas = current as HTMLCanvasElement
-    const gl = canvas.getContext('webgl')
-    if (!gl) throw Error('no webgl')
+    if (!canvas || !gl || !vertexShader || !fragmentShader) return
 
     canvas.width = width
     canvas.height = height
 
-    const program = createProgram(
-      gl,
-      createShader(gl, gl.VERTEX_SHADER, vertexShaderSource),
-      createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource),
-    )
+    const program = createProgram(gl, vertexShader, fragmentShader)
 
     const positionAttributeLocation = gl.getAttribLocation(
       program,
@@ -54,7 +45,7 @@ function App() {
     )
 
     gl.drawArrays(gl.TRIANGLES, 0, 3)
-  }, [ref, width, height, vertexShaderSource, fragmentShaderSource])
+  }, [gl, canvas, width, height, vertexShader, fragmentShader])
 
   return error ? (
     <p>{error.message}</p>
@@ -64,31 +55,6 @@ function App() {
       style={{ display: 'block', width: '100%', height: '100%' }}
     />
   )
-}
-
-function createShader(
-  gl: WebGLRenderingContext,
-  type: GLenum,
-  source: string,
-) {
-  const shader = gl.createShader(type)
-  gl.shaderSource(shader, source)
-  gl.compileShader(shader)
-  if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    return shader
-  }
-
-  const message = gl.getShaderInfoLog(shader)
-  gl.deleteShader(shader)
-  if (message.length > 0) {
-    throw message
-  } else {
-    throw Error(
-      `Error compiling ${
-        type === gl.VERTEX_SHADER ? 'vertex' : 'fragment'
-      } shader`,
-    )
-  }
 }
 
 function createProgram(gl, ...shaders) {
